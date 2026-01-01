@@ -373,6 +373,20 @@
   clear: both;
 }
 
+/* Edit Mode Styling */
+.editing-active img {
+  resize: both;
+  overflow: hidden;
+  border: 1px dashed transparent;
+  cursor: nwse-resize;
+  transition: border-color 0.2s;
+}
+
+.editing-active img:hover {
+  border-color: hsl(var(--primary));
+}
+
+
 /* Tables */
 .docx table {
   margin: 1.5rem 0;
