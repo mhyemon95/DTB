@@ -1,0 +1,462 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm paper-like palette */
+    --background: 40 33% 97%;
+    --foreground: 20 15% 15%;
+
+    --card: 40 30% 95%;
+    --card-foreground: 20 15% 15%;
+
+    --popover: 40 30% 95%;
+    --popover-foreground: 20 15% 15%;
+
+    /* Rich burgundy/wine accent */
+    --primary: 348 60% 35%;
+    --primary-foreground: 40 33% 97%;
+
+    /* Warm cream secondary */
+    --secondary: 35 30% 90%;
+    --secondary-foreground: 20 15% 20%;
+
+    --muted: 35 20% 92%;
+    --muted-foreground: 20 10% 45%;
+
+    /* Warm amber accent */
+    --accent: 28 70% 50%;
+    --accent-foreground: 40 33% 97%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 40 33% 97%;
+
+    --border: 30 20% 88%;
+    --input: 30 20% 88%;
+    --ring: 348 60% 35%;
+
+    --radius: 0.625rem;
+
+    /* Custom tokens */
+    --paper: 42 40% 96%;
+    --paper-dark: 35 25% 92%;
+    --ink: 20 20% 12%;
+    --chapter: 348 50% 30%;
+    --gold: 38 80% 55%;
+    --success: 150 60% 40%;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(40 33% 97%) 0%, hsl(35 30% 92%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(40 30% 96%) 0%, hsl(35 25% 93%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(348 60% 35%) 0%, hsl(348 55% 45%) 100%);
+
+    /* Shadows */
+    --shadow-book: 0 10px 40px -10px hsl(20 20% 12% / 0.15), 0 4px 12px -4px hsl(20 20% 12% / 0.1);
+    --shadow-card: 0 4px 20px -4px hsl(20 20% 12% / 0.1);
+    --shadow-hover: 0 20px 60px -15px hsl(20 20% 12% / 0.2);
+
+    /* Typography */
+    --font-serif: 'Crimson Pro', Georgia, serif;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+
+    /* Sidebar (keeping defaults) */
+    --sidebar-background: 40 30% 95%;
+    --sidebar-foreground: 20 15% 25%;
+    --sidebar-primary: 348 60% 35%;
+    --sidebar-primary-foreground: 40 33% 97%;
+    --sidebar-accent: 35 30% 90%;
+    --sidebar-accent-foreground: 20 15% 20%;
+    --sidebar-border: 30 20% 88%;
+    --sidebar-ring: 348 60% 35%;
+  }
+
+  .dark {
+    --background: 20 15% 10%;
+    --foreground: 40 20% 92%;
+
+    --card: 20 15% 12%;
+    --card-foreground: 40 20% 92%;
+
+    --popover: 20 15% 12%;
+    --popover-foreground: 40 20% 92%;
+
+    --primary: 348 55% 55%;
+    --primary-foreground: 20 15% 10%;
+
+    --secondary: 20 12% 18%;
+    --secondary-foreground: 40 20% 92%;
+
+    --muted: 20 12% 18%;
+    --muted-foreground: 35 15% 60%;
+
+    --accent: 28 65% 55%;
+    --accent-foreground: 20 15% 10%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 40 20% 92%;
+
+    --border: 20 12% 20%;
+    --input: 20 12% 20%;
+    --ring: 348 55% 55%;
+
+    --paper: 20 15% 14%;
+    --paper-dark: 20 15% 12%;
+    --ink: 40 20% 92%;
+    --chapter: 348 50% 60%;
+    --gold: 38 75% 60%;
+    --success: 150 55% 50%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(20 15% 10%) 0%, hsl(20 12% 14%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(20 15% 12%) 0%, hsl(20 12% 14%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(348 55% 55%) 0%, hsl(348 50% 65%) 100%);
+
+    --shadow-book: 0 10px 40px -10px hsl(0 0% 0% / 0.4);
+    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
+    --shadow-hover: 0 20px 60px -15px hsl(0 0% 0% / 0.5);
+
+    --sidebar-background: 20 15% 12%;
+    --sidebar-foreground: 40 20% 92%;
+    --sidebar-primary: 348 55% 55%;
+    --sidebar-primary-foreground: 20 15% 10%;
+    --sidebar-accent: 20 12% 18%;
+    --sidebar-accent-foreground: 40 20% 92%;
+    --sidebar-border: 20 12% 20%;
+    --sidebar-ring: 348 55% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+    @apply font-medium tracking-tight;
+  }
+}
+
+@layer utilities {
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .bg-paper {
+    background-color: hsl(var(--paper));
+  }
+
+  .bg-paper-dark {
+    background-color: hsl(var(--paper-dark));
+  }
+
+  .text-ink {
+    color: hsl(var(--ink));
+  }
+
+  .text-chapter {
+    color: hsl(var(--chapter));
+  }
+
+  .text-gold {
+    color: hsl(var(--gold));
+  }
+
+  .shadow-book {
+    box-shadow: var(--shadow-book);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-hover {
+    box-shadow: var(--shadow-hover);
+  }
+
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  /* Book spine effect */
+  .book-spine {
+    position: relative;
+  }
+
+  .book-spine::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--chapter)) 100%);
+    border-radius: 2px 0 0 2px;
+  }
+}
+
+/* Book content styling - preserves DOCX formatting */
+.book-content {
+  font-family: var(--font-serif);
+  line-height: 1.6;
+  color: hsl(var(--foreground));
+}
+
+/* Preserve all inline styles from DOCX */
+.book-content * {
+  /* Allow all inline styles to take precedence */
+}
+
+.book-content h1 {
+  @apply text-3xl font-semibold mt-8 mb-6;
+}
+
+.book-content h2 {
+  @apply text-2xl font-semibold mt-6 mb-4;
+}
+
+.book-content h3 {
+  @apply text-xl font-semibold mt-4 mb-3;
+}
+
+.book-content p {
+  @apply mb-4;
+}
+
+.book-content strong {
+  @apply font-bold;
+}
+
+.book-content em {
+  @apply italic;
+}
+
+.book-content u {
+  @apply underline;
+}
+
+.book-content ul {
+  @apply list-disc list-inside mb-4 space-y-2;
+}
+
+.book-content ol {
+  @apply list-decimal list-inside mb-4 space-y-2;
+}
+
+.book-content blockquote {
+  @apply pl-6 border-l-4 border-primary/30 italic my-6;
+}
+
+.book-content table {
+  @apply w-full border-collapse mb-6;
+}
+
+.book-content th,
+.book-content td {
+  @apply border border-border px-4 py-2 text-left;
+}
+
+.book-content th {
+  @apply bg-secondary font-semibold;
+}
+
+.book-content img {
+  @apply rounded-lg my-6 shadow-card;
+  /* Preserve original dimensions from DOCX */
+}
+
+.book-content p img {
+  @apply my-4;
+}
+
+.book-content a {
+  @apply text-primary underline hover:no-underline;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* DOCX Preview Formatting - Preserve original document layout */
+.docx {
+  font-family: var(--font-serif);
+  line-height: 1.6;
+  color: hsl(var(--foreground));
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Preserve all inline styles from DOCX rendering */
+.docx * {
+  /* Allow inline styles to take precedence */
+  box-sizing: border-box;
+}
+
+/* Paragraph spacing - ensure text is visible */
+.docx p {
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* Image spacing - critical for layout preservation */
+.docx img {
+  max-width: 100%;
+  height: auto;
+  /* Don't force block display - allow text wrapping */
+}
+
+/* Images that should float (text wrapping) */
+.docx img[style*="float"],
+.docx p img {
+  margin: 0.5rem 0 1rem 2.5rem;
+  /* Increased left margin for gap */
+  float: right;
+  clear: right;
+  /* Prevent stacking issues */
+  /* Allow text to wrap around images */
+}
+
+/* Ensure text after images is visible and wraps properly */
+.docx img+p,
+.docx img~p {
+  display: block;
+}
+
+/* Clear floats after sections to prevent layout issues */
+.docx::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Tables */
+.docx table {
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+  width: 100% !important;
+  /* Force full width */
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+.docx td,
+.docx th {
+  padding: 0.5rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.docx th {
+  background-color: hsl(var(--secondary));
+  font-weight: 600;
+}
+
+/* Headings */
+.docx h1 {
+  margin: 2rem 0 1rem;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.docx h2 {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.docx h3 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.docx h4,
+.docx h5,
+.docx h6 {
+  margin: 1rem 0 0.5rem;
+  font-weight: 600;
+}
+
+/* Lists */
+.docx ul,
+.docx ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+.docx li {
+  margin-bottom: 0.5rem;
+}
+
+/* Text formatting */
+.docx strong,
+.docx b {
+  font-weight: 700;
+}
+
+.docx em,
+.docx i {
+  font-style: italic;
+}
+
+/* Ensure all text content is visible */
+.docx span,
+.docx div {
+  display: inline;
+}
+
+.docx div {
+  display: block;
+}
+
+/* Charts and embedded objects */
+.docx svg,
+.docx canvas {
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+}
