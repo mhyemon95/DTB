@@ -1,28 +1,31 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Maximize2, Minimize2, X, Edit3, Check } from "lucide-react";
+import { FileText, Maximize2, Minimize2, X, Edit3, Check, Eye } from "lucide-react";
 import { renderAsync } from "docx-preview";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FormattingToolbar } from "./FormattingToolbar";
 import { useToast } from "@/hooks/use-toast";
+import { ParsedBook } from "@/lib/docx-parser";
 
 interface BookPreviewProps {
   title: string;
   chapters: any[];
   rawHtml?: string;
   file?: File;
+  parsedBook?: ParsedBook;
 }
 
 function convertDataAttributesToStyles(html: string): string {
   return html;
 }
 
-export function BookPreview({ title, rawHtml, file }: BookPreviewProps & { rawHtml: string }) {
+export function BookPreview({ title, rawHtml, file, parsedBook }: BookPreviewProps & { rawHtml: string }) {
   const docxContainerRef = useRef<HTMLDivElement>(null);
   const fullScreenContainerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showJson, setShowJson] = useState(false);
   const { toast } = useToast();
 
   const renderContent = async (container: HTMLElement) => {
@@ -86,6 +89,20 @@ export function BookPreview({ title, rawHtml, file }: BookPreviewProps & { rawHt
             </div>
 
             <div className="absolute right-4 top-3 flex items-center gap-2">
+              {parsedBook && (
+                <Button
+                  variant={showJson ? "default" : "ghost"}
+                  size="icon"
+                  className={cn(
+                    "transition-colors",
+                    !showJson && "text-muted-foreground hover:text-primary"
+                  )}
+                  onClick={() => setShowJson(!showJson)}
+                  title={showJson ? "Hide JSON" : "View JSON"}
+                >
+                  <Eye className="w-4 h-4" />
+                </Button>
+              )}
               <Button
                 variant={isEditing ? "default" : "ghost"}
                 size="icon"
@@ -111,6 +128,33 @@ export function BookPreview({ title, rawHtml, file }: BookPreviewProps & { rawHt
           </div>
 
           <div className="flex-1 overflow-y-auto bg-white relative">
+            {showJson && parsedBook && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="border-b bg-muted p-4 max-h-64 overflow-auto"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-medium text-foreground">JSON Structure</h4>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(JSON.stringify(parsedBook.jsonData, null, 2));
+                      toast({ title: "JSON copied to clipboard" });
+                    }}
+                    className="text-xs"
+                  >
+                    Copy
+                  </Button>
+                </div>
+                <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono">
+                  {JSON.stringify(parsedBook.jsonData, null, 2)}
+                </pre>
+              </motion.div>
+            )}
+
             {isEditing && (
               <div className="sticky top-4 z-50 mb-4 px-4">
                 <FormattingToolbar onFormat={handleFormat} />

@@ -17,11 +17,84 @@ export interface ParsedBook {
   title: string;
   chapters: BookChapter[];
   rawHtml: string;
+  jsonData: BookJSON;
+}
+
+export interface BookJSON {
+  bookId: string;
+  title: string;
+  pageSize: {
+    name: string;
+    width: number;
+    height: number;
+    widthMm: number;
+    heightMm: number;
+  };
+  globalSettings: {
+    backgroundColor: string;
+    backgroundImage: string;
+    backgroundImageOpacity: number;
+    backgroundImageSize: string;
+    backgroundImagePosition: string;
+    defaultFontFamily: string;
+    defaultFontSize: string;
+    defaultLineHeight: string;
+    defaultTextColor: string;
+    margins: {
+      top: number;
+      bottom: number;
+      left: number;
+      right: number;
+    };
+    padding: {
+      top: number;
+      bottom: number;
+      left: number;
+      right: number;
+    };
+    borderRadius: number;
+    shadow: boolean;
+    shadowColor: string;
+    shadowOpacity: number;
+    pageNumbering: {
+      enabled: boolean;
+      format: string;
+      position: string;
+      prefix: string;
+      suffix: string;
+      startFrom: number;
+      fontSize: string;
+    };
+  };
+  zoom: number;
+  totalPages: number;
+  createdAt: string;
+  updatedAt: string;
+  pages: Array<{
+    id: string;
+    title: string;
+    order: number;
+    createdAt: string;
+    updatedAt: string;
+    elements: Array<{
+      id: string;
+      type: string;
+      content: string;
+      styles: Record<string, any>;
+      position: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+      };
+    }>;
+  }>;
 }
 
 export async function parseDocxFile(file: File): Promise<ParsedBook> {
   const arrayBuffer = await file.arrayBuffer();
   
+  // Step 1: DOCX → HTML
   const result = await mammoth.convertToHtml({ arrayBuffer }, {
     convertImage: mammoth.images.imgElement(function(image) {
       return image.read("base64").then(function(imageBuffer) {
@@ -44,45 +117,140 @@ export async function parseDocxFile(file: File): Promise<ParsedBook> {
   });
 
   const html = result.value;
-  const processedHtml = processHtmlForFormatting(html);
-  const chapters = extractChaptersFromHtml(processedHtml);
-  
-  // Extract title from filename or first heading
   const title = file.name.replace(/\.docx$/i, "");
+  
+  // Step 2: HTML → JSON
+  const jsonData = convertHtmlToJson(html, title);
+  
+  // Step 3: JSON → HTML → JavaScript Object
+  const processedHtml = convertJsonToHtml(jsonData);
+  const chapters = extractChaptersFromHtml(processedHtml);
 
   return {
     title,
     chapters,
     rawHtml: processedHtml,
+    jsonData,
   };
 }
 
-function processHtmlForFormatting(html: string): string {
+function convertHtmlToJson(html: string, title: string): BookJSON {
   const parser = new DOMParser();
   const doc = parser.parseFromString(`<div>${html}</div>`, "text/html");
   const container = doc.body.firstChild as HTMLElement;
   
-  // Find all elements with style attributes and preserve all formatting
-  const elementsWithStyle = container.querySelectorAll('[style]');
-  elementsWithStyle.forEach(element => {
-    const style = element.getAttribute('style');
-    if (style) {
-      // Keep the original style attribute intact
-      const cleanedStyle = style
-        .replace(/;\s*$/, '') // Remove trailing semicolon
-        .split(';')
-        .map(s => s.trim())
-        .filter(s => s.length > 0)
-        .join('; ');
+  const bookId = `book-${crypto.randomUUID()}`;
+  const now = new Date().toISOString();
+  
+  const elements: any[] = [];
+  let yPosition = 50;
+  
+  container.childNodes.forEach((node, index) => {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = node as HTMLElement;
+      const tagName = element.tagName.toLowerCase();
       
-      if (cleanedStyle) {
-        element.setAttribute('style', cleanedStyle);
-      }
+      elements.push({
+        id: `element-${crypto.randomUUID()}`,
+        type: tagName === 'h1' ? 'heading' : tagName === 'h2' ? 'subheading' : 'text',
+        content: element.textContent || '',
+        styles: {
+          fontSize: tagName === 'h1' ? '24px' : tagName === 'h2' ? '20px' : '14px',
+          fontWeight: tagName.startsWith('h') ? 'bold' : 'normal',
+          color: '#333333',
+          fontFamily: 'Inter, system-ui, sans-serif'
+        },
+        position: {
+          x: 48,
+          y: yPosition,
+          width: 698,
+          height: tagName === 'h1' ? 40 : tagName === 'h2' ? 32 : 24
+        }
+      });
+      
+      yPosition += (tagName === 'h1' ? 60 : tagName === 'h2' ? 48 : 36);
     }
   });
   
-  return container.innerHTML;
+  return {
+    bookId,
+    title,
+    pageSize: {
+      name: "A4",
+      width: 794,
+      height: 1123,
+      widthMm: 210,
+      heightMm: 297
+    },
+    globalSettings: {
+      backgroundColor: "#ffffff",
+      backgroundImage: "",
+      backgroundImageOpacity: 1,
+      backgroundImageSize: "cover",
+      backgroundImagePosition: "center",
+      defaultFontFamily: "Inter, system-ui, sans-serif",
+      defaultFontSize: "14px",
+      defaultLineHeight: "1.5",
+      defaultTextColor: "#333333",
+      margins: {
+        top: 32,
+        bottom: 32,
+        left: 48,
+        right: 48
+      },
+      padding: {
+        top: 16,
+        bottom: 16,
+        left: 0,
+        right: 0
+      },
+      borderRadius: 0,
+      shadow: true,
+      shadowColor: "#000000",
+      shadowOpacity: 0.1,
+      pageNumbering: {
+        enabled: true,
+        format: "english",
+        position: "bottom-center",
+        prefix: "— ",
+        suffix: " —",
+        startFrom: 1,
+        fontSize: "14px"
+      }
+    },
+    zoom: 1,
+    totalPages: 1,
+    createdAt: now,
+    updatedAt: now,
+    pages: [{
+      id: `page-${crypto.randomUUID()}`,
+      title: "Page 1",
+      order: 0,
+      createdAt: now,
+      updatedAt: now,
+      elements
+    }]
+  };
 }
+
+function convertJsonToHtml(jsonData: BookJSON): string {
+  let html = '';
+  
+  jsonData.pages.forEach(page => {
+    page.elements.forEach(element => {
+      const tag = element.type === 'heading' ? 'h1' : element.type === 'subheading' ? 'h2' : 'p';
+      const styles = Object.entries(element.styles)
+        .map(([key, value]) => `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value}`)
+        .join('; ');
+      
+      html += `<${tag} style="${styles}">${element.content}</${tag}>`;
+    });
+  });
+  
+  return html;
+}
+
+
 
 function extractChaptersFromHtml(html: string): BookChapter[] {
   const parser = new DOMParser();

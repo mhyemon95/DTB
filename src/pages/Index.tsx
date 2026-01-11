@@ -165,7 +165,7 @@ const Index = () => {
                           Review the structure and content before exporting
                         </p>
                       </div>
-                      <BookPreview title={bookTitle} chapters={bookChapters} rawHtml={parsedBook?.rawHtml || ""} file={uploadedFile || undefined} />
+                      <BookPreview title={bookTitle} chapters={bookChapters} rawHtml={parsedBook?.rawHtml || ""} file={uploadedFile || undefined} parsedBook={parsedBook || undefined} />
                     </motion.div>
                   )}
 

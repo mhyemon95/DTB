@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, X, CheckCircle2, AlertCircle } from "lucide-react";
+import { Upload, FileText, X, CheckCircle2, AlertCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { parseDocxFile, ParsedBook } from "@/lib/docx-parser";
 
@@ -13,6 +13,8 @@ export function BookUploader({ onFileUpload }: BookUploaderProps) {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [parsedBook, setParsedBook] = useState<ParsedBook | null>(null);
+  const [showJson, setShowJson] = useState(false);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -24,6 +26,7 @@ export function BookUploader({ onFileUpload }: BookUploaderProps) {
         
         try {
           const parsedBook = await parseDocxFile(file);
+          setParsedBook(parsedBook);
           setIsUploading(false);
           onFileUpload(file, parsedBook);
         } catch (err) {
@@ -46,6 +49,8 @@ export function BookUploader({ onFileUpload }: BookUploaderProps) {
 
   const removeFile = () => {
     setUploadedFile(null);
+    setParsedBook(null);
+    setShowJson(false);
   };
 
   return (
@@ -151,14 +156,27 @@ export function BookUploader({ onFileUpload }: BookUploaderProps) {
               </div>
 
               {!isUploading && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={removeFile}
-                  className="text-muted-foreground hover:text-destructive"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
+                <div className="flex gap-2">
+                  {parsedBook && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowJson(!showJson)}
+                      className="text-primary hover:text-primary"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      {showJson ? 'Hide' : 'View'} JSON
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={removeFile}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+                </div>
               )}
             </div>
 
@@ -176,6 +194,32 @@ export function BookUploader({ onFileUpload }: BookUploaderProps) {
                 <AlertCircle className="w-4 h-4" />
                 <span>{error}</span>
               </div>
+            )}
+
+            {showJson && parsedBook && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 rounded-lg border bg-muted p-4 max-h-96 overflow-auto"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-medium text-foreground">Generated JSON Structure</h4>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(JSON.stringify(parsedBook.jsonData, null, 2));
+                    }}
+                    className="text-xs"
+                  >
+                    Copy
+                  </Button>
+                </div>
+                <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono">
+                  {JSON.stringify(parsedBook.jsonData, null, 2)}
+                </pre>
+              </motion.div>
             )}
           </motion.div>
         )}
