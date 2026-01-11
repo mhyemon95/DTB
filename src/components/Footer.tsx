@@ -36,11 +36,6 @@ export function Footer() {
               Contact
             </a>
           </nav>
-
-          {/* Copyright */}
-          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            Made with <Heart className="w-4 h-4 text-destructive fill-destructive" /> for writers
-          </p>
         </div>
       </div>
     </footer>
